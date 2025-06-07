@@ -44,16 +44,42 @@
 												<a class="dropdown-item" href="index.jsp?menu=buch_ausleihen">Ausgeliehene B&uuml;cher anzeigen</a>
 										</div>
 								</div>
+								<div class="nav-item dropdown">
+										<a class="nav-link dropdown-toggle ${param.menu=='behandlungen'}" href="#" id="behandlungen" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											Behandlungen
+										</a>
+										<div class="dropdown-menu" aria-labelledby="behandlungen">
+												<a class="dropdown-item" href="index.jsp?menu=behandlungen">Behandlungen anzeigen</a>
+										</div>
+								</div>
 
 						</nav>
 							
 						</div>
 					 </header>
 					<main role="main" class="inner cover">
+
+						<!-- Session setzen für Ptnr -->
+						<%
+							if (request.getParameter("ptnr") != null) {
+								session.setAttribute("ptnr", request.getParameter("ptnr"));
+							}
+						%>
+
 							<c:if test="${!empty param.menu}">
-									<jsp:include page="${param.menu}.jsp" />
-								</c:if>
+								<jsp:include page="${param.menu}.jsp" />
+							</c:if>
+
+								<!-- Statische Testdaten für Patientenauswahl -->
 								<c:if test="${empty param.menu}">
+									<form method="post" action="index.jsp?menu=behandlungen">
+										<select name="ptnr">
+											<option value="1">Max Muster</option>
+											<option value="2">Anna Beispiel</option>
+										</select>
+										<input type="submit" value="Weiter zur Behandlung" />
+									</form>
+
 									<jsp:include page="init.jsp" />
 								</c:if>
 					</main>

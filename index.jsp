@@ -7,11 +7,11 @@
 
 
 <sql:setDataSource
-		var="db"
-		driver="oracle.jdbc.OracleDriver"
-		url="jdbc:oracle:thin:@localhost:1521/xepdb1"
-		user="system"
-		password="password"
+    var="db"
+    driver="oracle.jdbc.driver.OracleDriver"
+    url="jdbc:oracle:thin:@localhost:1521/xepdb1"
+    user="csdc26bb_03"
+    password="urieGoo7la"
 />
 
 <sql:query var="personen" dataSource="${db}">
@@ -26,7 +26,7 @@
 sql:query> -->
 
 <sql:query var="patienten" dataSource="${db}">
-	SELECT pa.ptnr, pe.vorname, pe.nachname
+	SELECT pa.ptnr, pe.vorname, pe.nachname, pa.svnr
 	FROM patient pa
 	JOIN person pe ON pa.svnr = pe.svnr
 </sql:query>
@@ -37,19 +37,25 @@ sql:query> -->
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
 				<meta name="description" content="">
-				<meta name="author" content="J�rgen Falb, Lorenz Froihofer, Dominik Ertl">
+				<meta name="author" content="J rgen Falb, Lorenz Froihofer, Dominik Ertl">
 				<title>Krankenhaus</title>
 
 		
 				<!-- Bootstrap core CSS -->
-				<link href="css/bootstrap.min.css" rel="stylesheet">
-		
-				<!-- Custom styles for this template -->
-				<link href="css/uni.css" rel="stylesheet">
+				<link href="bootstrap.min.css" rel="stylesheet">
 			</head>
+
+			<%
+				String svnr = (String) session.getAttribute("svnr");
+				if (svnr == null) {
+					// Benutzer ist nicht eingeloggt → redirect oder login zeigen
+					response.sendRedirect("index.jsp?menu=login");
+					return;
+				}
+			%>
 		
 			<body>
-				<a href="login.jsp" class="btn btn-outline-primary"
+				<a href="index.jsp?menu=login" class="btn btn-outline-primary"
 			 	  style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
 					Login
 				</a>
@@ -58,34 +64,21 @@ sql:query> -->
 					<header class="masthead"><!-- mb-auto -->		
 						<div class="inner">
 							<h3 class="masthead-brand">Krankenhaus HeileWelt</h3>
-							<img class="rounded float-right img-responsive masthead-img" src="images/HeileWelt.png" alt="logo" title="logo" height="100" style="margin-left: 2rem"/>
+							<img class="rounded float-right img-responsive masthead-img" src="HeileWelt.png" alt="logo" title="logo" height="100" style="margin-left: 2rem"/>
 
 							<nav class="nav navbar-static-top nav-masthead justify-content-center">
 								<a class="nav-link ${empty param.menu ? 'active' : ''}" href="index.jsp" id="startmenu">Startseite</a>
 
-								<div class="nav-item dropdown">
-									<a class="nav-link dropdown-toggle ${param.menu=='patienten'}" href="#" id="patienten" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-										Patienten
-									</a>
-									<div class="dropdown-menu" aria-labelledby="patienten">
-										<a class="dropdown-item" href="index.jsp?menu=patienten">Patienten anlegen</a>
-									</div>
-								</div>
-								<div class="nav-item dropdown">
-										<a class="nav-link dropdown-toggle ${param.menu=='behandlungen'}" href="#" id="behandlungen" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-											Behandlungen
-										</a>
-										<div class="dropdown-menu" aria-labelledby="behandlungen">
-												<a class="dropdown-item" href="index.jsp?menu=behandlungen">Behandlungen anzeigen</a>
-										</div>
-								</div>
+								<a class="nav-link ${param.menu=='patienten'}" href="index.jsp?menu=patienten" id="anlegen">Patienten anlegen</a>
 
+								<a class="nav-link ${param.menu=='behandlungen'}" href="index.jsp?menu=behandlungen" id="behandlungen">Behandlungen anzeigen</a>
 						</nav>
 							
 						</div>
 					 </header>
-
-					<jsp:include page="init.jsp" />
+					<c:if test="${empty param.menu}">
+						<jsp:include page="init.jsp" />
+					</c:if>
 
 					<main role="main" class="inner cover">
 
@@ -140,14 +133,14 @@ sql:query> -->
 											</tr>
 											</thead>
 											<tbody>
-											<c:forEach var="person" items="${personen.rows}">
+											<c:forEach var="patient" items="${patienten.rows}">
 												<c:set var="suchbegriff" value="${fn:toLowerCase(param.suchbegriff)}" />
-												<c:set var="nachnameKlein" value="${fn:toLowerCase(person.NACHNAME)}" />
+												<c:set var="nachnameKlein" value="${fn:toLowerCase(patient.NACHNAME)}" />
 												<c:if test="${empty param.suchbegriff or fn:contains(nachnameKlein, suchbegriff)}">
 													<tr>
-														<td><c:out value="${person.SVNR}" /></td>
-														<td><c:out value="${person.VORNAME}" /></td>
-														<td><c:out value="${person.NACHNAME}" /></td>
+														<td><c:out value="${patient.SVNR}" /></td>
+														<td><c:out value="${patient.VORNAME}" /></td>
+														<td><c:out value="${patient.NACHNAME}" /></td>
 													</tr>
 												</c:if>
 											</c:forEach>
@@ -171,25 +164,6 @@ sql:query> -->
 								</c:if>
 
 					</main>
-		
-					<footer class="mastfoot mt-auto text-center">
-						<div class="inner">
-						    <p><a href="mailto:wbt@dedisys.org" class="nav-link">
-							    Kontaktieren Sie uns:
-							    <img class="rounded img-responsive mastfoot-img" src="images/email.jpg" alt="contact us" title="contact us" />
-						        </a>
-						    </p>
-						</div>
-					</footer>
 				</div>
-
-
-				<!-- Bootstrap core JavaScript
-				================================================== -->
-				<!-- Placed at the end of the document so the pages load faster -->
-				<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-				<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.3.1.slim.min.js"><\/script>')</script>
-				<script src="js/vendor/popper.min.js"></script>
-				<script src="js/bootstrap.min.js"></script>
 	    </body>
 </html>

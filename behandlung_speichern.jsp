@@ -6,12 +6,12 @@
     var="ds"
     driver="oracle.jdbc.OracleDriver"
     url="jdbc:oracle:thin:@localhost:1521/xepdb1"
-    user="system"
-    password="password"
+    user="csdc26bb_03"
+    password="urieGoo7la"
 />
-<!-- USERDATEN SPÄTER ÄNDERN
-user="csdc26bb_03"
-  password="urieGoo7la"
+<!-- LOKALE USERDATEN
+  user="system"
+  password="password"
 -->
 
 <!-- Behandlung in MERKT_VOR eintragen -->
@@ -48,6 +48,7 @@ user="csdc26bb_03"
         <%
             session.setAttribute("letzteBehandlung_tzeit", request.getParameter("tzeit"));
             session.setAttribute("letzteBehandlung_datum", request.getParameter("datum"));
+            session.setAttribute("letzteBehandlung_ptnr", session.getAttribute("ptnr"));
         %>
         <c:redirect url="index.jsp?menu=behandlungen" />
     </c:if>

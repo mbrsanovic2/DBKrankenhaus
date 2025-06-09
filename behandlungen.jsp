@@ -2,15 +2,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
  
-<sql:setDataSource var="ds"
+<sql:setDataSource var="db"
   driver="oracle.jdbc.driver.OracleDriver"
   url="jdbc:oracle:thin:@localhost:1521/xepdb1"
+    user="csdc26bb_03"
+    password="urieGoo7la"
+/>
+<!-- LOKALE USERDATEN
   user="system"
   password="password"
-/>
-<!-- USERDATEN SPÄTER ÄNDERN
-user="csdc26bb_03"
-  password="urieGoo7la"
 -->
 
 <!-- Arzt vorerst manuell gesetzt - kommt dann von index // tbd anpassen auf svnr statt arnr -->
@@ -30,7 +30,7 @@ user="csdc26bb_03"
 </c:if>
 
 <c:if test="${sessionScope.ptnr != null}">
-    <sql:query var="patient" dataSource="${ds}">
+    <sql:query var="patient" dataSource="${db}">
         SELECT per.Vorname, per.Nachname
         FROM Person per
         JOIN Patient pat ON pat.SVNr = per.SVNr
@@ -46,13 +46,18 @@ user="csdc26bb_03"
         (Patient Nr. <c:out value="${sessionScope.ptnr}" />)
     </p>
 
-    <sql:query var="behandlungen_patient" dataSource="${ds}">
+    <sql:query var="behandlungen_patient" dataSource="${db}">
         SELECT 
             beh.*,
             TO_CHAR(mvo.Datum, 'DD.MM.YYYY') AS DatumFormat,
+            per.Vorname AS ArztVorname,
+            per.Nachname AS ArztNachname,
             ort.Beschreibung
         FROM Merkt_vor mvo
         JOIN Behandlung beh ON beh.BID = mvo.BID AND beh.TZeit = mvo.TZeit
+        JOIN Arzt arz ON arz.ArNr = mvo.ArNr
+        JOIN Angestellter ang ON ang.AnNr = arz.AnNr
+        JOIN Person per ON per.SVNr = ang.SVNr
         JOIN ORT ort ON ort.RaumCode = beh.RaumCode
         WHERE mvo.PtNr = ?
         ORDER BY mvo.Datum ASC, mvo.TZeit ASC
@@ -64,7 +69,7 @@ user="csdc26bb_03"
     </c:if>
 
     <c:if test="${fn:length(behandlungen_patient.rows) != 0}">
-         <table class="table table-bordered table-striped table-hover table-sm">
+         <table class="table table-hover table-sm">
         <thead class="thead-light">
             <tr>
                 <th>Datum</th>
@@ -81,7 +86,7 @@ user="csdc26bb_03"
                     <td><c:out value="${b.TZeit}" /></td>
                     <td style="text-align: center;"><c:out value="${b.BID}" /></td>
                     <td><c:out value="${b.RaumCode}" /> <c:out value="${b.Beschreibung}" /></td>
-                    <td>Dr. <c:out value="${sessionScope.arname}" /></td>
+                    <td>Dr. <c:out value="${b.ArztNachname}" /> <c:out value="${b.ArztVorname}" /></td>
                 </tr>
             </c:forEach>
         </tbody>
@@ -93,7 +98,7 @@ user="csdc26bb_03"
 
 
 <!-- Zeige alle angebotene Behandlungen für Zuweisung Patient bzw. Übersicht -->
-<sql:query var="behandlungen" dataSource="${ds}">
+<sql:query var="behandlungen" dataSource="${db}">
     SELECT
         bht.*,
         beh.TZeit,
@@ -180,7 +185,7 @@ user="csdc26bb_03"
 <h4>Angebotene Behandlungen</h4>
 <p>Aktuell werden folgende Behandlungen angeboten</p>
 
-<table class="table table-bordered table-striped table-hover table-sm">
+<table class="table table-hover table-sm">
     <thead class="thead-light">
         <tr>
             <th scope="col">BID</th>

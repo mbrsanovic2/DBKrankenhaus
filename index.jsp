@@ -161,7 +161,7 @@ sql:query> -->
 										<div style="border: 1px solid rgb(0, 0, 0); padding: 5px 5px; background-color:rgb(229, 246, 252);">
 											<h6>Zuletzt angelegte Behandlung:</h6>
 											<p style="margin: 0;">
-												Arzt: <%= session.getAttribute("arname") %><br>
+												Arzt: Dr. <%= session.getAttribute("arname") %><br>
 												Patient: <%= session.getAttribute("ptnr") %><br>
 												Datum: <%= session.getAttribute("letzteBehandlung_datum") %><br>
 												Zeit: <%= session.getAttribute("letzteBehandlung_tzeit") %>

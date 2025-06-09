@@ -16,7 +16,8 @@ user="csdc26bb_03"
 <!-- Arzt vorerst manuell gesetzt - kommt dann von index // tbd anpassen auf svnr statt arnr -->
 <%
 	session.setAttribute("arnr", 201);
-    session.setAttribute("arname", "Doktorius Alfred");
+	session.setAttribute("svnr", "3456789101");
+    session.setAttribute("arname", "Doktorius");
 %>
 
 <h2>Behandlungen</h2><hr>
@@ -49,14 +50,9 @@ user="csdc26bb_03"
         SELECT 
             beh.*,
             TO_CHAR(mvo.Datum, 'DD.MM.YYYY') AS DatumFormat,
-            per.Vorname AS ArztVorname,
-            per.Nachname AS ArztNachname,
             ort.Beschreibung
         FROM Merkt_vor mvo
         JOIN Behandlung beh ON beh.BID = mvo.BID AND beh.TZeit = mvo.TZeit
-        JOIN Arzt arz ON arz.ArNr = mvo.ArNr
-        JOIN Angestellter ang ON ang.AnNr = arz.AnNr
-        JOIN Person per ON per.SVNr = ang.SVNr
         JOIN ORT ort ON ort.RaumCode = beh.RaumCode
         WHERE mvo.PtNr = ?
         ORDER BY mvo.Datum ASC, mvo.TZeit ASC
@@ -85,7 +81,7 @@ user="csdc26bb_03"
                     <td><c:out value="${b.TZeit}" /></td>
                     <td style="text-align: center;"><c:out value="${b.BID}" /></td>
                     <td><c:out value="${b.RaumCode}" /> <c:out value="${b.Beschreibung}" /></td>
-                    <td>Dr. <c:out value="${b.ArztNachname}" /> <c:out value="${b.ArztVorname}" /></td>
+                    <td>Dr. <c:out value="${sessionScope.arname}" /></td>
                 </tr>
             </c:forEach>
         </tbody>

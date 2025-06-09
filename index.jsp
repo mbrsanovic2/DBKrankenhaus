@@ -37,7 +37,7 @@ sql:query> -->
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
 				<meta name="description" content="">
-				<meta name="author" content="Jürgen Falb, Lorenz Froihofer, Dominik Ertl">
+				<meta name="author" content="Jï¿½rgen Falb, Lorenz Froihofer, Dominik Ertl">
 				<title>Krankenhaus</title>
 
 		
@@ -89,10 +89,11 @@ sql:query> -->
 
 					<main role="main" class="inner cover">
 
-						<!-- Session setzen für Ptnr -->
+						<!-- Session setzen fÃ¼r Ptnr -->
 						<%
-							if (request.getParameter("ptnr") != null) {
-								session.setAttribute("ptnr", request.getParameter("ptnr"));
+							String ptnr = request.getParameter("ptnr");
+							if (ptnr != null && !ptnr.isEmpty()) {
+								session.setAttribute("ptnr", ptnr);
 							}
 						%>
 
@@ -100,18 +101,20 @@ sql:query> -->
 								<jsp:include page="${param.menu}.jsp" />
 							</c:if>
 
-								<!-- Statische Testdaten für Patientenauswahl -->
+								<!-- Statische Testdaten fÃ¼r Patientenauswahl -->
 								<c:if test="${empty param.menu}">
 									<!-- Dropdown zur Auswahl eines Patienten -->
 									<p>Patientenanzahl: <c:out value="${fn:length(patienten.rows)}"/></p>
 
 									<form method="post" action="index.jsp?menu=behandlungen">
 										<div class="form-group">
-											<label for="ptnr">Bitte wählen Sie einen Patienten:</label>
+											<label for="ptnr">Bitte w&auml;hlen Sie einen Patienten:</label>
 											<select class="form-control" id="ptnr" name="ptnr" required>
+												<option value="" ${sessionScope.ptnr == null ? 'selected' : ''}>-- Bitte w&auml;hlen --</option>
+
 												<c:forEach var="p" items="${patienten.rows}">
-													<option value="${p.ptnr}">
-															${p.ptnr} ${p.vorname} ${p.nachname}
+													<option value="${p.ptnr}" ${p.ptnr == sessionScope.ptnr ? 'selected' : ''}>
+														${p.ptnr} ${p.vorname} ${p.nachname}
 													</option>
 												</c:forEach>
 											</select>
@@ -153,8 +156,20 @@ sql:query> -->
 									</div>
 
 
-
+									<c:if test="${sessionScope.arname != null}">
+										<br>
+										<div style="border: 1px solid rgb(0, 0, 0); padding: 5px 5px; background-color:rgb(229, 246, 252);">
+											<h6>Zuletzt angelegte Behandlung:</h6>
+											<p style="margin: 0;">
+												Arzt: <%= session.getAttribute("arname") %><br>
+												Patient: <%= session.getAttribute("ptnr") %><br>
+												Datum: <%= session.getAttribute("letzteBehandlung_datum") %><br>
+												Zeit: <%= session.getAttribute("letzteBehandlung_tzeit") %>
+											</p>
+										</div>
+									</c:if>
 								</c:if>
+
 					</main>
 		
 					<footer class="mastfoot mt-auto text-center">

@@ -44,6 +44,11 @@ user="csdc26bb_03"
             <sql:param value="${param.bid}" />
             <sql:param value="${param.datum}" />
         </sql:update>
+        
+        <%
+            session.setAttribute("letzteBehandlung_tzeit", request.getParameter("tzeit"));
+            session.setAttribute("letzteBehandlung_datum", request.getParameter("datum"));
+        %>
         <c:redirect url="index.jsp?menu=behandlungen" />
     </c:if>
 

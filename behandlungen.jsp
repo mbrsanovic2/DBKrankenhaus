@@ -16,6 +16,7 @@ user="csdc26bb_03"
 <!-- Arzt vorerst manuell gesetzt - kommt dann von index // tbd anpassen auf svnr statt arnr -->
 <%
 	session.setAttribute("arnr", 201);
+    session.setAttribute("arname", "Doktorius Alfred");
 %>
 
 <h2>Behandlungen</h2><hr>

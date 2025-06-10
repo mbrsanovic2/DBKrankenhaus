@@ -53,37 +53,49 @@
 		}
 	%>
 
-	<%
-		/**
-		String svnr = (String) session.getAttribute("svnr");
-		if (svnr == null) {
-			// Benutzer ist nicht eingeloggt → redirect oder login zeigen
-			response.sendRedirect("index.jsp?menu=login");
-			return;
-		}
-		**/
+	<% 
+	    String svnr = (String) session.getAttribute("svnr");
+	    String menu = request.getParameter("menu");
+
+        //!menu.equals verhindert redirect loop
+	    if (svnr == null && (menu == null || !menu.equals("login"))) {
+		    response.sendRedirect("index.jsp?menu=login");
+		    return;
+	            }
 	%>
 
 	<body>
-		<a href="index.jsp?menu=login" class="btn btn-outline-primary"
-			style="position: absolute; top: 20px; left: 20px; z-index: 1000;">
-			Login
-		</a>
 		<!-- Navigation -->
 		<div class="d-flex align-items-center h-100 p-5 mx-auto flex-column">
 			<header class="masthead">		
 				<div class="container d-flex justify-content-start align-items-end">
 					<img class="masthead-img" src="HeileWelt_Logo.png" alt="logo" title="logo"/>
 
-					<nav class="nav navbar-static-top nav-masthead justify-content-center">
+					<nav class="nav navbar-static-top nav-masthead justify-content-center" style="padding-right: 0;">
 						<a class="nav-link ${empty param.menu ? 'active' : ''}" href="index.jsp" id="startmenu">Startseite</a>
 						<a class="nav-link ${param.menu=='patienten'}" href="index.jsp?menu=patienten" id="anlegen">Patienten anlegen</a>
 						<a class="nav-link ${param.menu=='behandlungen'}" href="index.jsp?menu=behandlungen" id="behandlungen">Behandlungen anzeigen</a>
+
+						<c:if test="${empty sessionScope.arname}">
+							<a class="btn btn-outline-primary" href="index.jsp?menu=login" id="login" style="margin-left: 15px;">Login</a>
+						</c:if>
+
+						<c:if test="${not empty sessionScope.arname}">
+							<a class="btn btn-outline-secondary" href="index.jsp?menu=login" id="logout" style="margin-left: 15px;">Logout</a>
+						</c:if>
 					</nav>
 				</div>
 			</header>
 
-			<main role="main" style="width: 50%; max-width: 712px;">
+			<main role="main" style="width: 55%; max-width: 800px;">
+				<!-- Eingeloggter Arzt-->
+				<c:if test="${not empty sessionScope.arname}">
+					<strong><p style="text-align: right; color: var(--blue);">
+						Hallo Dr. ${sessionScope.arname}
+					</p></strong>
+					<br>
+				</c:if>
+
 				<!-- Willkommensnachricht auf Startseite anzeigen -->
 				<c:if test="${empty param.menu}">
 					<jsp:include page="init.jsp" />

@@ -67,7 +67,13 @@
 <c:if test="${empty sessionScope.arname}">
     <h2>Login für Ärzte</h2>
     <hr>
-
+    
+    <c:if test="${param.fehler == '1'}">
+        <p style="color: red;">
+            Ungültige SVNR – bitte erneut versuchen.
+        </p>
+    </c:if>
+    
     <form method="post" action="login.jsp" class="form-inline mt-3">
         <label for="svnr" style="margin-right: 8px;">SVNR:</label>
         <input type="text" id="svnr" name="svnr" class="form-control mr-2" required />
